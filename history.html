@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History | Expense Tracker</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <script>
+        (function () {
+            const stored = localStorage.getItem('theme');
+            const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="dashboard.html" class="nav-brand">Expense Tracker</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-list').classList.toggle('active')"
+                aria-label="Toggle navigation">☰</button>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="add.html" class="nav-link">Add</a></li>
+                <li><a href="history.html" class="nav-link active">History</a></li>
+                <li><a href="login.html" class="nav-link">Login</a></li>
+                <li><a href="signup.html" class="nav-btn nav-btn-primary">Signup</a></li>
+                <li><button id="logoutBtn" class="nav-btn nav-btn-danger">logout</button></li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <header class="header">
+            <div>
+                <h1 class="logo">Transaction History</h1>
+                <p class="subtitle">View all your past transactions</p>
+            </div>
+            <div class="date-badge">
+                <span id="date-badge"></span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="content-grid" style="grid-template-columns: 1fr;">
+
+            <!-- Transactions List -->
+            <div>
+                <div class="toolbar">
+                    <h3 class="section-title" style="border:none; margin:0;">Filter & Sort</h3>
+
+                    <div class="filter-group">
+                        <!-- Filter -->
+                        <div class="btn-group">
+                            <button type="button" data-filter="all" class="filter-btn active">All</button>
+                            <button type="button" data-filter="income" class="filter-btn"
+                                id="filter-income">Inc</button>
+                            <button type="button" data-filter="expense" class="filter-btn"
+                                id="filter-expense">Exp</button>
+                        </div>
+
+                        <!-- Sort -->
+                        <select id="sort" style="width: auto;" onchange="filterTransactions()">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="highest">Highest</option>
+                            <option value="lowest">Lowest</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- List Container -->
+                <ul id="list" class="list">
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="general.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

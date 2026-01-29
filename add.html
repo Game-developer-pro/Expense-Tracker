@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Transaction | Expense Tracker</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <script>
+        (function () {
+            const stored = localStorage.getItem('theme');
+            const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="dashboard.html" class="nav-brand">ExpenseTracker</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-list').classList.toggle('active')"
+                aria-label="Toggle navigation">☰</button>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="add.html" class="nav-link active">Add</a></li>
+                <li><a href="history.html" class="nav-link">History</a></li>
+                <li><a href="login.html" class="nav-link">Login</a></li>
+                <li><a href="signup.html" class="nav-btn nav-btn-primary">Signup</a></li>
+                <li><button id="logoutBtn" class="nav-btn nav-btn-danger">logout</button></li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <header class="header">
+            <div>
+                <h1 class="logo">New Transaction</h1>
+                <p class="subtitle">Add an income or expense</p>
+            </div>
+            <div class="date-badge">
+                <span id="date-badge"></span>
+            </div>
+        </header>
+
+        <!-- Main Content (Form Only) -->
+        <div class="content-grid" style="grid-template-columns: 1fr; max-width: 600px; margin: 0 auto;">
+
+            <div class="form-section">
+                <div class="form-card">
+                    <div id="form">
+                        <!-- Type Selector -->
+                        <div class="type-toggle">
+                            <label>
+                                <input type="radio" name="type" value="expense" checked id="expense">
+                                <div class="type-option expense">Expense</div>
+                            </label>
+                            <label>
+                                <input type="radio" name="type" value="income" id="income">
+                                <div class="type-option income">Income</div>
+                            </label>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label for="text">Description</label>
+                            <input type="text" id="text" placeholder="e.g. Grocery shopping" />
+                            <span class="error-message" id="text-error"></span>
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="form-group">
+                            <label for="amount">Amount</label>
+                            <div class="input-icon-wrapper">
+                                <span class="input-icon-symbol" id="currencyIcon"></span>
+                                <input type="number" id="amount" placeholder="0.00" step="0.01" min="0"
+                                    class="input-with-icon" />
+                            </div>
+                            <span class="error-message" id="amount-error"></span>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category">
+                                <option value="general">General</option>
+                                <option value="food">Food & Dining</option>
+                                <option value="transport">Transportation</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="bills">Bills & Utilities</option>
+                                <option value="shopping">Shopping</option>
+                                <option value="salary">Salary (Income)</option>
+                                <option value="investment">Investment (Income)</option>
+                            </select>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" />
+                        </div>
+
+                        <button class="btn-primary" id="addTransactionBtn" onclick="addTransaction();">Add
+                            Transaction</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="general.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

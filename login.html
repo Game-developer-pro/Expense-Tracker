@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Expense Tracker</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <script>
+        (function () {
+            const stored = localStorage.getItem('theme');
+            const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="dashboard.html" class="nav-brand">Expense Tracker</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-list').classList.toggle('active')"
+                aria-label="Toggle navigation">☰</button>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="add.html" class="nav-link">Add</a></li>
+                <li><a href="history.html" class="nav-link">History</a></li>
+                <li><a href="login.html" class="nav-link active">Login</a></li>
+                <li><a href="signup.html" class="nav-btn nav-btn-primary">Signup</a></li>
+            </ul>
+        </nav>
+
+        <!-- Login Form Section -->
+        <div style="max-width: 400px; margin: 3rem auto;">
+            <div class="form-card">
+                <h2 class="section-title" style="text-align: center; border-bottom: none; margin-bottom: 1.5rem;">
+                    Welcome Back</h2>
+
+                <form>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="text" id="email" placeholder="you@company.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" placeholder="Enter your password">
+                            <button type="button" class="password-toggle" id="passwordToggle"
+                                aria-label="Toggle password visibility">
+                                <!-- Eye Open Icon (Default) -->
+                                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" width="20" height="20">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="loginBtn" style="margin-top: 1rem;">Sign in</button>
+                </form>
+
+                <div
+                    style="text-align: center; margin-top: 1.5rem; border-top: 1px solid #F3F4F6; padding-top: 1.5rem;">
+                    <p style="font-size: 0.875rem; color: #6B7280;">
+                        Don't have an account?
+                        <a href="signup.html" style="color: #4F46E5; font-weight: 500; text-decoration: none;">Sign
+                            up</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="general.js"></script>
+    <script type="module">
+        import { auth, db, signInWithEmailAndPassword, doc, setDoc } from './auth.js';
+
+        const loginForm = document.querySelector('form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const passwordToggle = document.getElementById('passwordToggle');
+
+        // Eye Icons
+        const eyeOpen = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>`;
+
+        const eyeClosed = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+            </svg>`;
+
+        if (passwordToggle) {
+            passwordToggle.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+
+                // Toggle icon
+                if (type === 'text') {
+                    passwordToggle.innerHTML = eyeClosed;
+                } else {
+                    passwordToggle.innerHTML = eyeOpen;
+                }
+            });
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            // Hide any previous errors
+            hideButtonError('loginBtn');
+
+            // Validate inputs
+            if (!email.trim()) {
+                showButtonError('loginBtn', 'Please enter your email address');
+                return;
+            }
+            if (!password.trim()) {
+                showButtonError('loginBtn', 'Please enter your password');
+                return;
+            }
+
+            // Show loading state
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                console.log("Logged in as:", user.email);
+
+                // Store token in Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    email: user.email,
+                    token: user.accessToken,
+                    lastLogin: new Date().toISOString()
+                }, { merge: true });
+
+                // Also keep in localStorage for quick access
+                localStorage.setItem('token', user.accessToken);
+                localStorage.setItem('userId', user.uid);
+
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                const errorCode = error.code;
+                console.error("Login error:", errorCode, error.message);
+
+                // Show user-friendly error messages
+                let errorMsg = 'Login failed. Please try again.';
+                if (errorCode === 'auth/user-not-found') {
+                    errorMsg = 'No account found with this email';
+                } else if (errorCode === 'auth/wrong-password') {
+                    errorMsg = 'Incorrect password';
+                } else if (errorCode === 'auth/invalid-email') {
+                    errorMsg = 'Invalid email address';
+                } else if (errorCode === 'auth/invalid-credential') {
+                    errorMsg = 'Email or password mismatch';
+                } else if (errorCode === 'auth/too-many-requests') {
+                    errorMsg = 'Too many attempts. Please try again later';
+                }
+
+                showButtonError('loginBtn', errorMsg);
+
+                // Remove loading state on error
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+            }
+        });
+
+    </script>
+</body>
+
+</html>

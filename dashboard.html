@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Expense Tracker</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <script>
+        (function () {
+            const stored = localStorage.getItem('theme');
+            const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- Container -->
+    <div class="container">
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="dashboard.html" class="nav-brand">Expense Tracker</a>
+            <button class="nav-toggle" onclick="document.querySelector('.nav-list').classList.toggle('active')"
+                aria-label="Toggle navigation">☰</button>
+            <ul class="nav-list">
+                <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+                <li><a href="add.html" class="nav-link">Add</a></li>
+                <li><a href="history.html" class="nav-link">History</a></li>
+                <li><a href="login.html" class="nav-link">Login</a></li>
+                <li><a href="signup.html" class="nav-btn nav-btn-primary">Signup</a></li>
+                <li><button id="logoutBtn" class="nav-btn nav-btn-danger">Logout</button></li>
+            </ul>
+        </nav>
+
+        <!-- Header -->
+        <header class="header">
+            <div>
+                <h1 class="logo">Dashboard</h1>
+                <p class="subtitle">Overview of your finances</p>
+            </div>
+            <div class="header-controls">
+                <div class="currency-wrapper">
+                    <select id="currency-select" class="currency-select">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="JPY">JPY</option>
+                        <option value="INR">INR</option>
+                    </select>
+                </div>
+                <div class="date-badge">
+                    <span id="date-badge"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Balance Dashboard -->
+        <div class="dashboard">
+            <!-- Total Balance -->
+            <div class="card">
+                <h3 class="card-title">Total Balance</h3>
+                <p class="card-amount" id="balance">0</p>
+            </div>
+
+            <!-- Income -->
+            <div class="card">
+                <div class="card-flex">
+                    <div>
+                        <h3 class="card-title">Income</h3>
+                        <p class="card-amount plus" id="money-plus">0</p>
+                    </div>
+                    <div class="icon-bubble plus">
+                        <svg class="svg-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense -->
+            <div class="card">
+                <div class="card-flex">
+                    <div>
+                        <h3 class="card-title">Expenses</h3>
+                        <p class="card-amount minus" id="money-minus">0</p>
+                    </div>
+                    <div class="icon-bubble minus">
+                        <svg class="svg-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-grid" style="grid-template-columns: 1fr;">
+            <!-- Recent Transactions List -->
+            <div>
+                <div class="toolbar" style="justify-content: flex-start;">
+                    <h3 class="section-title" style="border:none; margin:0;">Recent Activities</h3>
+                </div>
+
+                <!-- List Container -->
+                <ul id="list" class="list" style="max-height: 260px; overflow-y: hidden;">
+
+                </ul>
+
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="history.html" style="color: var(--primary); text-decoration: none; font-weight: 500;">View
+                        Full History &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="general.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
