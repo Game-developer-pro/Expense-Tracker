@@ -271,7 +271,7 @@ function formatCurrency(amount) {
     }).format(amount);
 }
 
-// Filter Event Listeners
+// ── Filter button event listeners ──────────────────────────
 document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -280,6 +280,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     });
 });
 
+// ── Currency selector ───────────────────────────────────────
 if (currencyEl) {
     currencyEl.addEventListener('change', (e) => {
         currency = e.target.value;
@@ -290,36 +291,75 @@ if (currencyEl) {
     });
 }
 
+// ── Search input event listener ────────────────────────────
+const searchInput = document.getElementById('search');
+const searchClearBtn = document.getElementById('search-clear');
+
+if (searchInput) {
+    searchInput.addEventListener('input', () => {
+        // Show / hide the ✕ button based on whether there is text
+        if (searchClearBtn) {
+            searchClearBtn.style.opacity = searchInput.value.trim() ? '1' : '0';
+        }
+        filterTransactions();
+    });
+}
+
+// ── Main filter / search / sort function ───────────────────
 function filterTransactions() {
+    // 1. Type filter (All / Income / Expense)
     const activeBtn = document.querySelector('.filter-btn.active');
-    const filter = activeBtn ? activeBtn.dataset.filter : 'all';
+    const typeFilter = activeBtn ? activeBtn.dataset.filter : 'all';
 
-    // Create copy to filter/sort to avoid mutating original data
-    let displayTransactions = [...transactions];
+    // 2. Search keyword
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
-    if (filter !== 'all') {
-        displayTransactions = displayTransactions.filter(transaction => transaction.type === filter);
+    // Work on a copy so the source array is never mutated
+    let result = [...transactions];
+
+    // Apply type filter
+    if (typeFilter !== 'all') {
+        result = result.filter(t => t.type === typeFilter);
     }
 
-    const sort = document.getElementById('sort');
-    if (sort) {
-        displayTransactions.sort((a, b) => {
-            if (sort.value == 'newest') {
-                return new Date(b.date) - new Date(a.date);
-            } else if (sort.value == 'oldest') {
-                return new Date(a.date) - new Date(b.date);
-            } else if (sort.value == 'highest') {
-                return b.amount - a.amount;
-            } else if (sort.value == 'lowest') {
-                return a.amount - b.amount;
+    // Apply keyword search (matches description, case-insensitive)
+    if (query) {
+        result = result.filter(t =>
+            t.description.toLowerCase().includes(query)
+        );
+    }
+
+    // 3. Sort
+    const sortEl = document.getElementById('sort');
+    if (sortEl) {
+        const sortVal = sortEl.value;
+        result.sort((a, b) => {
+            switch (sortVal) {
+                case 'newest':  return new Date(b.date) - new Date(a.date);
+                case 'oldest':  return new Date(a.date) - new Date(b.date);
+                case 'highest': return b.amount - a.amount;
+                case 'lowest':  return a.amount - b.amount;
+                default:        return 0;
             }
         });
     }
 
-    init(displayTransactions);
+    init(result);
 }
 
-// Logout functionality
+// ── Clear search helper ────────────────────────────────────
+function clearSearch() {
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+    }
+    if (searchClearBtn) {
+        searchClearBtn.style.opacity = '0';
+    }
+    filterTransactions();
+}
+
+// ── Logout ─────────────────────────────────────────────────
 if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
         try {
@@ -333,5 +373,6 @@ if (logoutBtn) {
     });
 }
 
-// Make filterTransactions available globally for the sort dropdown
+// Expose functions needed by inline HTML attributes
 window.filterTransactions = filterTransactions;
+window.clearSearch = clearSearch;

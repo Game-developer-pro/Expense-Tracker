@@ -173,9 +173,7 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// ===========================================
 // Theme Toggle Functionality
-// ===========================================
 
 /**
  * Get the current theme preference
@@ -276,3 +274,4 @@ if (window.matchMedia) {
         }
     });
 }
+// 
