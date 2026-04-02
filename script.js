@@ -1,4 +1,4 @@
-import { auth, db, onAuthStateChanged, signOut, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy } from './auth.js';
+import { auth, db, onAuthStateChanged, signOut, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc } from './auth.js';
 
 const listEl = document.getElementById('list');
 const textEl = document.getElementById('text');
@@ -282,8 +282,49 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
 
 // ── Currency selector ───────────────────────────────────────
 if (currencyEl) {
-    currencyEl.addEventListener('change', (e) => {
-        currency = e.target.value;
+    currencyEl.addEventListener('change', async (e) => {
+        const newCurrency = e.target.value;
+        const oldCurrency = currency;
+        
+        if (newCurrency === oldCurrency) return;
+        
+        // Disable selector while converting
+        currencyEl.disabled = true;
+        
+        try {
+            // Fetch real-time exchange rates
+            const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${oldCurrency}`);
+            const data = await response.json();
+            const rate = data.rates[newCurrency];
+            
+            if (rate) {
+                // Update local transactions
+                transactions = transactions.map(t => ({
+                    ...t,
+                    amount: t.amount * rate
+                }));
+                
+                // Update Firestore transactions
+                if (currentUser) {
+                    const updatePromises = transactions.map(t => {
+                        const tRef = doc(db, "users", currentUser.uid, "transactions", t.id);
+                        return updateDoc(tRef, { amount: t.amount });
+                    });
+                    await Promise.all(updatePromises);
+                }
+            } else {
+                throw new Error('Rate not found');
+            }
+        } catch (error) {
+            console.error("Error converting currencies:", error);
+            // Revert back into old currency on failure
+            currencyEl.value = oldCurrency;
+            currencyEl.disabled = false;
+            return;
+        }
+        
+        currencyEl.disabled = false;
+        currency = newCurrency;
         localStorage.setItem('currency', currency);
         updateCurrencyUI();
         updateBalance();
